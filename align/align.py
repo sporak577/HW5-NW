@@ -57,6 +57,7 @@ class NeedlemanWunsch:
         # Generating substitution matrix
         self.sub_dict = self._read_sub_matrix(sub_matrix_file) # substitution dictionary
 
+
     def _read_sub_matrix(self, sub_matrix_file):
         """
         DO NOT MODIFY THIS METHOD! IT IS ALREADY COMPLETE!
@@ -126,13 +127,49 @@ class NeedlemanWunsch:
         self._seqA = seqA
         self._seqB = seqB
         
+        lenA, lenB = len(seqA), len(seqB)
         # TODO: Initialize matrix private attributes for use in alignment
         # create matrices for alignment scores, gaps, and backtracing
-        pass
 
+        self._align_matrix = np.zeros((lenA + 1, lenB + 1))
+        self._gapA_matrix = np.zeros((lenA + 1, lenB + 1))
+        self._gapB_matrix = np.zeros((lenA + 1, lenB + 1))
+        self._back = np.zeros((lenA + 1, lenB + 1), dtype = int)
         
         # TODO: Implement global alignment here
-        pass      		
+
+        #we first initialize the first column, the sequence seqA is aligned with gaps - 
+        #the first gap gets the gap opening penalty, every additional gap gets the gap extension penalty
+        for i in range(1, lenA + 1):
+            self._align_matrix[i, 0] = self.gap_open + (i - 1) * self.gap_extend  
+            #backtracking matrix stores 1 to indicate that these values were derived by moving up in the matrix
+            self._back[i, 0] = 1 #up
+`         
+        #same logic here -> first gap gets a gap opening penalty. each subsequent gap gets the gap extension penalty.
+        for j in range(1, lenB + 1):
+            self._align_matrix[0, j] = self.gap_open + (j - 1) * self.gap_extend
+            #backtracking matrix scores 2 to indicate that these values were derived by moving left in the matrix
+            self._back[0, j] = 2
+
+        #now we are filling the alignment matrix after having initialized the first row and column
+        #we loop over each cell (i,j), starting from (1,1) up to (lenA, lenB)
+        #each cell represents the alignment of seqA[:i] with seqB[:j] (seqA is y-axis here)
+        for i in range(1, lenA + 1):
+            for j in range(1, lenB + 1):
+                #the substitution score is retrieved from self.sub_dict, if the pair is not found we assume default mismatch of -1
+                #the key of the sub_dict is a tuple of two characters, the value is the score for aligning them
+                match = self._align_matrix[i-1, j-1] + self.sub_dict.get((seqA[i-1], seqB[j-1]), -1)
+                #the score if we insert a gap in seqB (i.e. moving up in the matrix
+                #if the previous move was also up, we apply the gap extension penalty, otherwise we apply the gap opening penalty
+                delete = self._align_matrix[i-1, j] + (self.gap_extend if self._back[i-1, j] == 1 else self.gap_open)
+                #the score if we insert a gap in seqA (moving left in the matrix)
+                #if the previous move was also left, we apply the gap extension penalty, otherwise the gap opening penalty
+                insert = self._align_matrix[i, j-1] + (self.gap_extend if self._back[i, j-1] == 2 else self.gap_open)
+
+                #choose the best option, value of self._align_matrix[i, j] is the best possible score from the three computed values
+                self._align_matrix[i, j] = max(match, delete, insert)
+
+
         		    
         return self._backtrace()
 
