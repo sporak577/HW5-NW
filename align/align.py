@@ -148,9 +148,8 @@ class NeedlemanWunsch:
         #the first gap gets the gap opening penalty, every additional gap gets the gap extension penalty
         for i in range(1, lenA + 1):
             self._align_matrix[i, 0] = self.gap_open + (i - 1) * self.gap_extend  
-            #backtracking matrix stores 1 to indicate that these values were derived by moving up in the matrix
+            #backtracking matrix stores 1 to indicate that these values were derived by moving up in the matrix           
             self._back[i, 0] = 1 #up
-`         
         #same logic here -> first gap gets a gap opening penalty. each subsequent gap gets the gap extension penalty.
         for j in range(1, lenB + 1):
             self._align_matrix[0, j] = self.gap_open + (j - 1) * self.gap_extend
