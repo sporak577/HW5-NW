@@ -1,7 +1,12 @@
 # Importing Dependencies
 import pytest
-from align import NeedlemanWunsch, read_fasta
+from align.align import NeedlemanWunsch, read_fasta
 import numpy as np
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from align import NeedlemanWunsch, read_fasta
 
 def test_nw_alignment():
     """
@@ -16,7 +21,7 @@ def test_nw_alignment():
     seq1, _ = read_fasta("./data/test_seq1.fa")
     seq2, _ = read_fasta("./data/test_seq2.fa")
 
-    nw = NeedlemanWunsch("BLOSUM62.txt", gap_open= -10, gap_extend= -1)
+    nw = NeedlemanWunsch("./substitution_matrices/BLOSUM62.mat", gap_open= -10, gap_extend= -1)
     nw.align(seq1, seq2)
 
     #check if matrix is correctly initialized 
@@ -34,7 +39,7 @@ def test_nw_backtrace():
     seq3, _ = read_fasta("./data/test_seq3.fa")
     seq4, _ = read_fasta("./data/test_seq4.fa")
     
-    nw = NeedlemanWunsch("BLOSUM62.txt", gap_open= -10, gap_extend= -1)
+    nw = NeedlemanWunsch("./substitution_matrices/BLOSUM62.mat", gap_open= -10, gap_extend= -1)
     score, aligned_seqA, aligned_seqB = nw.align(seq3, seq4)
 
     expected_aligned_seqA = "MAVHQLIRRP"
