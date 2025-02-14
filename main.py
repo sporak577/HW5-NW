@@ -18,7 +18,7 @@ def main():
     #BLOSUM matrix is a substitution matrix containing precomputed scores that indicate how likely one aa is to be substituted by another due to evolution
     #assigns positive scores for similar aa, and neg for dissimilar subst. 
     #if a pair seqA[i-1], seqB[j-1] is found is BLOSUM, it is retreived, else a default mismatch score of -1 is used
-    nw = NeedlemanWunsch("BLOSUM.txt", gap_open= -10, gap_extend= -1)
+    nw = NeedlemanWunsch("./substitution_matrices/BLOSUM62.mat", gap_open= -10, gap_extend= -1)
 
     species = {
         #header is used as a dictionary key, will see e.g. Gallus_gallus: 95.0 for the NW score
