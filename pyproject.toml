@@ -1,0 +1,19 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[project]
+name = "needleman_wunsch"
+version = "0.1.0"
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+description = "A Needleman-Wunsch global alignment package."
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "numpy","typing"
+]
+
+[tool.flit.module]
+name = "align"
