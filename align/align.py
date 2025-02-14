@@ -2,6 +2,12 @@
 import numpy as np
 from typing import Tuple
 
+"""
+as always used chatgpt
+to help me with refining the code and improve 
+general understanding 
+"""
+
 # Defining class for Needleman-Wunsch Algorithm for Global pairwise alignment
 class NeedlemanWunsch:
     """ Class for NeedlemanWunsch Alignment
@@ -169,8 +175,14 @@ class NeedlemanWunsch:
                 #choose the best option, value of self._align_matrix[i, j] is the best possible score from the three computed values
                 self._align_matrix[i, j] = max(match, delete, insert)
 
-
-        		    
+                #we update the backtracking matrix self._back to remember which move was chosen
+                if self._align_matrix[i, j] == match: 
+                    self._back[i, j] = 0 #diagonal
+                elif self._align_matrix[i, j] == delete:
+                    self._back[i, j] = 1 #up
+                else:
+                    self._back[i, j] = 2 #left
+                        		    
         return self._backtrace()
 
     def _backtrace(self) -> Tuple[float, str, str]:
@@ -187,9 +199,35 @@ class NeedlemanWunsch:
          	(alignment score, seqA alignment, seqB alignment) : Tuple[float, str, str]
          		the score and corresponding strings for the alignment of seqA and seqB
         """
-        pass
+        #i and j are initialized to the last indices of seqA and seqB
+        i, j = len(self._seqA), len(self._seqB)
+        #alignA and alignB are initialized as empty strings and will store the final aligned sequences
+        alignA, alignB = "", ""
+        
+        #continues until fully traced back to the start, where indices are zero 
+        while i > 0 or j > 0:
+            if i > 0 and j > 0 and self._back[i, j] == 0:
+                alignA = self._seqA[i-1] + alignA
+                alignB = self._seqB[j-1] + alignB
+                i -= 1
+                j -= 1 
+                #it goes up, because self._back == 1, therefore a gap in alignB, as here defined on the x-axis
+                #we only reduce index from seqA (y axis) by one, therefore only i-1 but not j-1
+            elif i > 0 and self._back[i, j] == 1:
+                alignA = self._seqA[i-1] + alignA
+                alignB = "-" + alignB
+                i -= 1
+            else:
+                alignA = "-" + alignA
+                alignB = self._seqB[j-1] + alignB
+                j -= 1
+
+        self.seqA_align = alignA 
+        self.seqB_align = alignB
+        self.alignment_score = self._align_matrix[len(self._seqA), len(self._seqB)]
 
         return (self.alignment_score, self.seqA_align, self.seqB_align)
+
 
 
 def read_fasta(fasta_file: str) -> Tuple[str, str]:
